@@ -54,7 +54,7 @@ public:
 
   T PopTop() {
     if (head == nullptr)
-      return nullptr;
+      return -1;
     Node<T> *temp = head;
     head = head->next;
     T temp_data = temp->data;
@@ -203,5 +203,117 @@ public:
       current = current->next;
     }
     std::cout << std::endl;
+  }
+};
+
+#include <iostream>
+
+template <class T> class UniqueCollection {
+private:
+  T *elements;  // Массив для хранения элементов
+  int size;     // Текущий размер коллекции
+  int capacity; // Вместимость коллекции
+
+  // Увеличивает размер массива, если он заполнен
+  void resize() {
+    capacity *= 2;
+    T *newElements = new T[capacity];
+    for (int i = 0; i < size; ++i) {
+      newElements[i] = elements[i];
+    }
+    delete[] elements;
+    elements = newElements;
+  }
+
+public:
+  // Проверяет, существует ли элемент в коллекции
+  bool exists(T element) const {
+    for (int i = 0; i < size; ++i) {
+      if (elements[i] == element) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  T GetElement(int index = 0) {
+    if (index >= 0 && index <= size)
+      return elements[index];
+    return elements[0];
+  }
+
+  int GetSize() { return size; }
+
+  UniqueCollection() {
+    capacity = 10;
+    elements = new T[capacity];
+    size = 0;
+  }
+
+  ~UniqueCollection() { delete[] elements; }
+
+  // Метод для добавления элемента
+  void add(T element) {
+    if (!exists(element)) {
+      if (size == capacity) {
+        resize();
+      }
+      elements[size++] = element; // Добавляем элемент
+    }
+  }
+
+  // Метод для удаления элемента
+  void remove(T element) {
+    for (int i = 0; i < size; ++i) {
+      if (elements[i] == element) {
+        elements[i] =
+            elements[size - 1]; // Заменяем удаляемый элемент последним
+        --size; // Уменьшаем размер
+        return;
+      }
+    }
+  }
+
+  // Метод для объединения двух коллекций
+  UniqueCollection unionWith(const UniqueCollection &other) const {
+    UniqueCollection newCollection;
+    for (int i = 0; i < size; ++i) {
+      newCollection.add(elements[i]);
+    }
+    for (int i = 0; i < other.size; ++i) {
+      newCollection.add(other.elements[i]);
+    }
+    return newCollection;
+  }
+
+  // Метод для исключения элементов другой коллекции
+  UniqueCollection except(const UniqueCollection &other) const {
+    UniqueCollection newCollection;
+    for (int i = 0; i < size; ++i) {
+      if (!other.exists(elements[i])) {
+        newCollection.add(elements[i]);
+      }
+    }
+    return newCollection;
+  }
+
+  // Метод для пересечения двух коллекций
+  UniqueCollection intersect(const UniqueCollection &other) const {
+    UniqueCollection newCollection;
+    for (int i = 0; i < size; ++i) {
+      if (other.exists(elements[i])) {
+        newCollection.add(elements[i]);
+      }
+    }
+    return newCollection;
+  }
+
+  // Метод для вывода коллекции
+  void print() const {
+    std::cout << "UniqueCollection: { ";
+    for (int i = 0; i < size; ++i) {
+      std::cout << elements[i] << " ";
+    }
+    std::cout << "}" << std::endl;
   }
 };
